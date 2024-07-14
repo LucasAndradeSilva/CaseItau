@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using CaseItau.IOC;
 
 namespace CaseItau.API
 {
@@ -26,6 +27,7 @@ namespace CaseItau.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddCustomServices();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,6 +43,8 @@ namespace CaseItau.API
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.AddCustomAppBuilder();
 
             app.UseEndpoints(endpoints =>
             {

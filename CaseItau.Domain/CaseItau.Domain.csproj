@@ -4,4 +4,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CaseItau.Data\CaseItau.Data.csproj" />
+    <ProjectReference Include="..\CaseItau.Repositories\CaseItau.Repositories.csproj" />
+  </ItemGroup>
+
 </Project>

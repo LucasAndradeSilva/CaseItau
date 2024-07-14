@@ -12,5 +12,6 @@ namespace CaseItau.Data.Entities
         public int TypeCode { get; set; }
         public string TypeName { get; set; }
         public decimal? Equity { get; set; }
+        public Type Type { get; set; }
     }
 }
