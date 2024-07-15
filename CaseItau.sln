@@ -15,15 +15,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "99 Test Layer", "99 Test La
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 Data Layer", "02 Data Layer", "{D6531191-192D-4527-9111-A7913135680E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaseItau.Data", "CaseItau.Data\CaseItau.Data.csproj", "{5B914D9C-2278-438E-B61B-CB8CE3518749}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaseItau.Data", "CaseItau.Data\CaseItau.Data.csproj", "{5B914D9C-2278-438E-B61B-CB8CE3518749}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaseItau.Domain", "CaseItau.Domain\CaseItau.Domain.csproj", "{AE9DEEC1-F61F-42E4-99CF-7F72CB8D55EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaseItau.Domain", "CaseItau.Domain\CaseItau.Domain.csproj", "{AE9DEEC1-F61F-42E4-99CF-7F72CB8D55EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaseItau.IOC", "CaseItau.Infrasctruture\CaseItau.IOC.csproj", "{CAE0BA43-EDDF-41D7-95FE-50CD2F1CE318}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaseItau.IOC", "CaseItau.Infrasctruture\CaseItau.IOC.csproj", "{CAE0BA43-EDDF-41D7-95FE-50CD2F1CE318}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaseItau.Test", "CaseItau.Test\CaseItau.Test.csproj", "{E76A6DCE-3C5D-49F3-A762-269B70779DD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaseItau.Test", "CaseItau.Test\CaseItau.Test.csproj", "{E76A6DCE-3C5D-49F3-A762-269B70779DD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaseItau.Repositories", "CaseItau.Repositories\CaseItau.Repositories.csproj", "{67913880-A79F-43A5-B534-D2670EA221B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaseItau.Repositories", "CaseItau.Repositories\CaseItau.Repositories.csproj", "{67913880-A79F-43A5-B534-D2670EA221B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

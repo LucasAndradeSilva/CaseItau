@@ -8,6 +8,8 @@ using System.Data.SQLite;
 using CaseItau.Data.Entities;
 using CaseItau.Domain.Interfaces;
 using CaseItau.Domain.DTO;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace CaseItau.API.Controllers
 {
@@ -16,10 +18,11 @@ namespace CaseItau.API.Controllers
     public class FundController : ControllerBase
     {
         private readonly IFundService _fundService;
-
-        public FundController(IFundService fundService)
+        private readonly ILogger<FundController> _logger;
+        public FundController(IFundService fundService, ILogger<FundController> logger)
         {
             _fundService = fundService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -27,103 +30,175 @@ namespace CaseItau.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> GetAsync(int pageNumber = 1, int pageSize = 20)
         {
-            //var lista = new List<Fund>();
-            //var con = new SQLiteConnection("Data Source=dbCaseItau.s3db");
-            //con.Open();
-            //var cmd = con.CreateCommand();
-            //cmd.CommandText = "SELECT F.*, T.NOME AS NOME_TIPO FROM FUNDO F INNER JOIN TIPO_FUNDO T ON T.CODIGO = F.CODIGO_TIPO";
-            //cmd.CommandType = System.Data.CommandType.Text;
-            //var reader = cmd.ExecuteReader();
-            //while(reader.Read())
-            //{
-            //    var f = new Fund();
-            //    f.Codigo = reader[0].ToString();
-            //    f.Nome = reader[1].ToString();
-            //    f.Cnpj = reader[2].ToString();
-            //    f.CodigoTipo = int.Parse(reader[3].ToString());
-            //    f.Patrimonio = decimal.Parse(reader[4].ToString());
-            //    f.NomeTipo = reader[5].ToString();                
-            //    lista.Add(f);
-            //}
-            
-            return Ok(new ResponseDTO());
+            _logger.LogInformation($"Buscando fundos - Page: {pageNumber}, Size: {pageSize} - [FundController]");
+
+            var funds = await _fundService.GetPaginationFundsAsync(pageNumber, pageSize);
+
+            var response = new ResponseDTO(funds);
+
+            if (!funds.Any())
+            {
+                response.Success = false;
+                response.Message = $"Nenhum fundo encontrado";
+
+                _logger.LogInformation($"{response.Message} - [FundController]");
+
+                return NotFound(response);
+            }
+
+            _logger.LogInformation($"{funds.Count()} fundos encontrados- [FundController]");
+
+            return Ok(response);
         }
 
-        // GET: api/Fundo/ITAUTESTE01
+
+        /// <summary>
+        /// Obtem um fundo espeficido - GET: api/Fundo/ITAUTESTE01
+        /// </summary>
+        /// <param name="codigo"></param>
+        /// <returns></returns>
         [HttpGet("{codigo}", Name = "Get")]
-        public IActionResult Get(string codigo)
+        public async Task<IActionResult> GetAsync(string codigo)
         {
-            //var con = new SQLiteConnection("Data Source=dbCaseItau.s3db");
-            //con.Open();
-            //var cmd = con.CreateCommand();
-            //cmd.CommandText = "SELECT F.*, T.NOME AS NOME_TIPO FROM FUNDO F INNER JOIN TIPO_FUNDO T ON T.CODIGO = F.CODIGO_TIPO WHERE F.CODIGO = '" + codigo + "'";
-            //cmd.CommandType = System.Data.CommandType.Text;
-            //var reader = cmd.ExecuteReader();
-            //if (reader.Read())
-            //{
-            //    var f = new Fundo();
-            //    f.Codigo = reader[0].ToString();
-            //    f.Nome = reader[1].ToString();
-            //    f.Cnpj = reader[2].ToString();
-            //    f.CodigoTipo = int.Parse(reader[3].ToString());
-            //    f.Patrimonio = decimal.Parse(reader[4].ToString());
-            //    f.NomeTipo = reader[5].ToString();
-            //    return f;
-            //}
-            return Ok(new ResponseDTO());
-        }
+            _logger.LogInformation("Buscando um fundo - [FundController]");
 
-        // POST: api/Fundo
+            var fund = await _fundService.GetAsync(x => x.Code.ToLower() == codigo.ToLower());
+
+            var response = new ResponseDTO(fund);
+
+            if (fund is null)
+            {
+                response.Success = false;
+                response.Message = $"Nenhum fundo código {codigo} encontrado";
+
+                _logger.LogInformation($"{response.Message} - [FundController]");
+
+                return NotFound(response);
+            }
+
+            _logger.LogInformation($"Fundo codigo {codigo} encontrado - [FundController]");
+
+            return Ok(response);
+        }
+        
+        /// <summary>
+        /// Insere um novo fundo - POST: api/Fundo
+        /// </summary>
+        /// <param name="fund"></param>
+        /// <returns></returns>
         [HttpPost]
-        public IActionResult Post([FromBody] Fund value)
+        public async Task<IActionResult> PostAsync([FromBody] Fund fund)
         {
-            //var con = new SQLiteConnection("Data Source=dbCaseItau.s3db");
-            //con.Open();
-            //var cmd = con.CreateCommand();
-            //cmd.CommandText = "INSERT INTO FUNDO VALUES('" + value.Codigo + "','" + value.Nome + "','" + value.Cnpj + "',"+value.CodigoTipo.ToString() + ",NULL)";
-            //cmd.CommandType = System.Data.CommandType.Text;
-            //var resultado = cmd.ExecuteNonQuery();
-            return Ok(new ResponseDTO());
-        }
+            _logger.LogInformation("Inserindo fundo - [FundController]");
 
-        // PUT: api/Fundo/ITAUTESTE01
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Erro nas validações - [FundController]", ModelState);
+                return BadRequest(new ResponseDTO(ModelState, false, "Erro nas validações"));
+            }                
+            
+            await _fundService.AddAsync(fund);
+
+            _logger.LogInformation($"Fundo código {fund.Code} inserido com sucesso! - [FundController]");
+
+            return CreatedAtAction(nameof(PostAsync) ,new ResponseDTO(fund));                        
+        }
+        
+        /// <summary>
+        /// Alterar dados do fundo - api/Fundo/ITAUTESTE01
+        /// </summary>
+        /// <param name="codigo"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         [HttpPut("{codigo}")]
-        public IActionResult Put(string codigo, [FromBody] Fund value)
-        {
-            //var con = new SQLiteConnection("Data Source=dbCaseItau.s3db");
-            //con.Open();
-            //var cmd = con.CreateCommand();
-            //cmd.CommandText = "UPDATE FUNDO SET Nome = '" + value.Nome + "', CNPJ = '" + value.Cnpj + "', CODIGO_TIPO = " + value.CodigoTipo + " WHERE CODIGO = '" + codigo + "'";
-            //cmd.CommandType = System.Data.CommandType.Text;
-            //var resultado = cmd.ExecuteNonQuery();
-            return Ok(new ResponseDTO());
-        }
+        public IActionResult Put(string codigo, [FromBody] Fund fund)
+        {            
+            _logger.LogInformation($"Alterando fundo código {codigo} - [FundController]");
 
-        // DELETE: api/Fundo/ITAUTESTE01
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Erro nas validações - [FundController]", ModelState);
+                return BadRequest(new ResponseDTO(ModelState, false, "Erro nas validações"));
+            }
+
+            fund.Code = codigo;
+
+            _fundService.Update(fund);
+
+            _logger.LogInformation($"Fundo Código {codigo} Atualizado com Sucesso! - [FundController]");
+
+            return Ok(new ResponseDTO(fund, message: "Fundo Atualizado com Sucesso!"));
+        }
+        
+        /// <summary>
+        /// Deletar fundo - api/Fundo/ITAUTESTE01
+        /// </summary>
+        /// <param name="codigo"></param>
+        /// <returns></returns>
         [HttpDelete("{codigo}")]
-        public IActionResult Delete(string codigo)
+        public async Task<IActionResult> Delete(string codigo)
         {
-            //var con = new SQLiteConnection("Data Source=dbCaseItau.s3db");
-            //con.Open();
-            //var cmd = con.CreateCommand();
-            //cmd.CommandText = "DELETE FROM FUNDO WHERE CODIGO = '" + codigo + "'";
-            //cmd.CommandType = System.Data.CommandType.Text;
-            //var resultado = cmd.ExecuteNonQuery();
-            return Ok(new ResponseDTO());
+            _logger.LogInformation($"Deletando fundo código {codigo} - [FundController]");
+
+            var fund = await _fundService.GetAsync(x => x.Code.ToLower() == codigo.ToLower());
+
+            var response = new ResponseDTO(fund);
+
+            if (fund is null)
+            {
+                response.Success = false;
+                response.Message = $"Nenhum fundo código {codigo} encontrado";
+
+                _logger.LogInformation($"{response.Message} - [FundController]");
+
+                return NotFound(response);
+            }
+
+            _fundService.Remove(fund);
+
+            response = new ResponseDTO(fund, message: $"Fundo código {codigo} removido com sucesso!");
+
+            _logger.LogInformation($"{response.Message} - [FundController]");
+
+            return Ok(response);
         }
 
-        [HttpPut("{codigo}/patrimonio")]
-        public IActionResult MovimentarPatrimonio(string codigo, [FromBody] decimal value)
+        /// <summary>
+        /// Atualiza patrimonio do fundo
+        /// </summary>
+        /// <param name="codigo"></param>
+        /// <param name="equity"></param>
+        /// <returns></returns>
+        [HttpPut("{codigo}/patrimonio")]        
+        public async Task<IActionResult> MovimentarPatrimonioAsync(string codigo, [FromBody] decimal equity)
         {
-            //var con = new SQLiteConnection("Data Source=dbCaseItau.s3db");
-            //con.Open();
-            //var cmd = con.CreateCommand();
-            //cmd.CommandText = "UPDATE FUNDO SET PATRIMONIO = IFNULL(PATRIMONIO,0) + " + value.ToString() + " WHERE CODIGO = '" + codigo + "'";
-            //cmd.CommandType = System.Data.CommandType.Text;
-            //var resultado = cmd.ExecuteNonQuery();
-            return Ok(new ResponseDTO());
+            _logger.LogInformation($"Atualizando Patrimonio do fundo código {codigo} - [FundController]");
+
+            var fund = await _fundService.GetAsync(x => x.Code.ToLower() == codigo.ToLower());
+
+            var response = new ResponseDTO(fund);
+
+            if (fund is null)
+            {
+                response.Success = false;
+                response.Message = $"Nenhum fundo código {codigo} encontrado";
+
+                _logger.LogInformation($"{response.Message} - [FundController]");
+
+                return NotFound(response);
+            }
+
+            fund.Equity = equity;
+
+            _fundService.Update(fund);
+
+            response = new ResponseDTO(fund, message: $"O Patrimonio do fundo código {codigo} foi atualizado!");
+
+            _logger.LogInformation($"{response.Message} - [FundController]");
+
+            return Ok(response);
         }
     }
 }

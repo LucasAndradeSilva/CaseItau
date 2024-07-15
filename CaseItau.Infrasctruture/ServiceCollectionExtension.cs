@@ -1,6 +1,8 @@
 ﻿using CaseItau.Data;
 using CaseItau.Domain.Interfaces;
 using CaseItau.Domain.Services;
+using CaseItau.Repositories;
+using CaseItau.Repositories.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -14,6 +16,7 @@ namespace CaseItau.IOC
         {
             services.AddDatabase();
             services.AddDependencyInjections();
+            services.AddCustomSwagger();
             return services;
         }
 
@@ -25,7 +28,28 @@ namespace CaseItau.IOC
 
         private static IServiceCollection AddDependencyInjections(this IServiceCollection services)
         {
-            services.AddScoped<IFundService, FundService>();
+            services.AddScoped<IFundService, FundService>();            
+            return services;
+        }
+
+        private static IServiceCollection AddCustomSwagger(this IServiceCollection services)
+        {
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "Case Itau Fundos",
+                    Version = "v1",
+                    Description = "Dotumentação da API para Gerencias Fundos.",
+                    Contact = new Microsoft.OpenApi.Models.OpenApiContact
+                    {
+                        Name = "Lucas Andrade Silva",
+                        Email = "lucasandradesilva2019@gmail.com",
+                        Url = new Uri("https://github.com/LucasAndradeSilva"),
+                    },
+                });
+            });
+
             return services;
         }
     }
