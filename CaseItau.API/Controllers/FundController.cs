@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,7 +48,7 @@ namespace CaseItau.API.Controllers
                 return NotFound(response);
             }
 
-            _logger.LogInformation($"{funds.Count()} fundos encontrados- [FundController]");
+            _logger.LogInformation($"{funds.Count()} fundos encontrados - [FundController]");
 
             return Ok(response);
         }
@@ -71,14 +71,14 @@ namespace CaseItau.API.Controllers
             if (fund is null)
             {
                 response.Success = false;
-                response.Message = $"Nenhum fundo código {codigo} encontrado";
+                response.Message = $"Nenhum fundo com o código {codigo} encontrado";
 
                 _logger.LogInformation($"{response.Message} - [FundController]");
 
                 return NotFound(response);
             }
 
-            _logger.LogInformation($"Fundo codigo {codigo} encontrado - [FundController]");
+            _logger.LogInformation($"Fundo com o código {codigo} encontrado - [FundController]");
 
             return Ok(response);
         }
@@ -101,7 +101,7 @@ namespace CaseItau.API.Controllers
             
             await _fundService.AddAsync(fund);
 
-            _logger.LogInformation($"Fundo código {fund.Code} inserido com sucesso! - [FundController]");
+            _logger.LogInformation($"Fundo com o código {fund.Code} inserido com sucesso! - [FundController]");
 
             return CreatedAtAction(nameof(PostAsync) ,new ResponseDTO(fund));                        
         }

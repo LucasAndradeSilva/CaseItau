@@ -3,12 +3,15 @@ using CaseItau.Domain.Interfaces;
 using CaseItau.Domain.Services;
 using CaseItau.Repositories;
 using CaseItau.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
-namespace CaseItau.IOC
+namespace CaseItau.IOC.Extensions
 {
     public static class ServiceCollectionExtension
     {
@@ -22,13 +25,14 @@ namespace CaseItau.IOC
 
         private static IServiceCollection AddDatabase(this IServiceCollection services)
         {
-            services.AddScoped(instance => new FundDbContext());
+            services.AddDbContext<FundDbContext>();
+
             return services;
         }
 
         private static IServiceCollection AddDependencyInjections(this IServiceCollection services)
         {
-            services.AddScoped<IFundService, FundService>();            
+            services.AddScoped<IFundService, FundService>();
             return services;
         }
 

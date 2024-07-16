@@ -1,4 +1,5 @@
-﻿using CaseItau.Data.Entities;
+﻿using CaseItau.Data;
+using CaseItau.Data.Entities;
 using CaseItau.Domain.DTO;
 using CaseItau.Domain.Interfaces;
 using CaseItau.Repositories;
@@ -19,7 +20,7 @@ namespace CaseItau.Domain.Services
     public class FundService : GenericRepository<Fund>, IFundService
     {
         private readonly ILogger<FundService> _logger;
-        public FundService(DbContext context, ILogger<FundService> logger) : base(context, logger)
+        public FundService(FundDbContext context, ILogger<FundService> logger) : base(context, logger)
         {
             _logger = logger;
         }
@@ -35,7 +36,7 @@ namespace CaseItau.Domain.Services
                        .Take(pageSize)
                    );
 
-                return funds.ToList();
+                return funds?.ToList();
             }
             catch (Exception ex)
             {
